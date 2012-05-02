@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module RSpec
   module Core
 

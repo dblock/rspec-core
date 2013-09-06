@@ -12,8 +12,8 @@ module RSpec
         def example_group_started(example_group)
           super(example_group)
 
-          output.puts if @group_level == 0
-          output.puts "#{current_indentation}#{example_group.description.strip}"
+          output_puts if @group_level == 0
+          output_puts "#{current_indentation}#{example_group.description.strip}"
 
           @group_level += 1
         end
@@ -24,17 +24,17 @@ module RSpec
 
         def example_passed(example)
           super(example)
-          output.puts passed_output(example)
+          output_puts passed_output(example)
         end
 
         def example_pending(example)
           super(example)
-          output.puts pending_output(example, example.execution_result[:pending_message])
+          output_puts pending_output(example, example.execution_result[:pending_message])
         end
 
         def example_failed(example)
           super(example)
-          output.puts failure_output(example, example.execution_result[:exception])
+          output_puts failure_output(example, example.execution_result[:exception])
         end
 
         def failure_output(example, exception)

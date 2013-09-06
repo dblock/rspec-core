@@ -12,15 +12,15 @@ module RSpec
       # @see RSpec::Core::Reporter
       class BaseTextFormatter < BaseFormatter
         def message(message)
-          output.puts message
+          output_puts message
         end
 
         def dump_failures
           return if failed_examples.empty?
-          output.puts
-          output.puts "Failures:"
+          output_puts
+          output_puts "Failures:"
           failed_examples.each_with_index do |example, index|
-            output.puts
+            output_puts
             pending_fixed?(example) ? dump_pending_fixed(example, index) : dump_failure(example, index)
             dump_backtrace(example)
           end
@@ -45,8 +45,8 @@ module RSpec
         def dump_summary(duration, example_count, failure_count, pending_count)
           super(duration, example_count, failure_count, pending_count)
           dump_profile unless mute_profile_output?(failure_count)
-          output.puts "\nFinished in #{format_duration(duration)}\n"
-          output.puts colorise_summary(summary_line(example_count, failure_count, pending_count))
+          output_puts "\nFinished in #{format_duration(duration)}\n"
+          output_puts colorise_summary(summary_line(example_count, failure_count, pending_count))
           dump_commands_to_rerun_failed_examples
         end
 
@@ -56,12 +56,12 @@ module RSpec
         #
         def dump_commands_to_rerun_failed_examples
           return if failed_examples.empty?
-          output.puts
-          output.puts("Failed examples:")
-          output.puts
+          output_puts
+          output_puts("Failed examples:")
+          output_puts
 
           failed_examples.each do |example|
-            output.puts(failure_color("rspec #{RSpec::Core::Metadata::relative_path(example.location)}") + " " + detail_color("# #{example.full_description}"))
+            output_puts(failure_color("rspec #{RSpec::Core::Metadata::relative_path(example.location)}") + " " + detail_color("# #{example.full_description}"))
           end
         end
 
@@ -80,11 +80,11 @@ module RSpec
           time_taken = sorted_examples[:slows] / sorted_examples[:total]
           percentage = '%.1f' % ((time_taken.nan? ? 0.0 : time_taken) * 100)
 
-          output.puts "\nTop #{sorted_examples[:examples].size} slowest examples (#{format_seconds(sorted_examples[:slows])} seconds, #{percentage}% of total time):\n"
+          output_puts "\nTop #{sorted_examples[:examples].size} slowest examples (#{format_seconds(sorted_examples[:slows])} seconds, #{percentage}% of total time):\n"
 
           sorted_examples[:examples].each do |example|
-            output.puts "  #{example.full_description}"
-            output.puts "    #{bold(format_seconds(example.execution_result[:run_time]))} #{bold("seconds")} #{format_caller(example.location)}"
+            output_puts "  #{example.full_description}"
+            output_puts "    #{bold(format_seconds(example.execution_result[:run_time]))} #{bold("seconds")} #{format_caller(example.location)}"
           end
         end
 
@@ -93,13 +93,13 @@ module RSpec
           sorted_groups = slowest_groups
           return if sorted_groups.empty?
 
-          output.puts "\nTop #{sorted_groups.size} slowest example groups:"
+          output_puts "\nTop #{sorted_groups.size} slowest example groups:"
           slowest_groups.each do |loc, hash|
             average = "#{bold(format_seconds(hash[:average]))} #{bold("seconds")} average"
             total   = "#{format_seconds(hash[:total_time])} seconds"
             count   = pluralize(hash[:count], "example")
-            output.puts "  #{hash[:description]}"
-            output.puts "    #{average} (#{total} / #{count}) #{loc}"
+            output_puts "  #{hash[:description]}"
+            output_puts "    #{average} (#{total} / #{count}) #{loc}"
           end
         end
 
@@ -116,12 +116,12 @@ module RSpec
 
         def dump_pending
           unless pending_examples.empty?
-            output.puts
-            output.puts "Pending:"
+            output_puts
+            output_puts "Pending:"
             pending_examples.each do |pending_example|
-              output.puts pending_color("  #{pending_example.full_description}")
-              output.puts detail_color("    # #{pending_example.execution_result[:pending_message]}")
-              output.puts detail_color("    # #{format_caller(pending_example.location)}")
+              output_puts pending_color("  #{pending_example.full_description}")
+              output_puts detail_color("    # #{pending_example.execution_result[:pending_message]}")
+              output_puts detail_color("    # #{format_caller(pending_example.location)}")
               if pending_example.execution_result[:exception] \
                 && RSpec.configuration.show_failures_in_pending_blocks?
                 dump_failure_info(pending_example)
@@ -132,9 +132,9 @@ module RSpec
         end
 
         def seed(number)
-          output.puts
-          output.puts "Randomized with seed #{number}"
-          output.puts
+          output_puts
+          output_puts "Randomized with seed #{number}"
+          output_puts
         end
 
         def close
@@ -253,13 +253,13 @@ module RSpec
 
         def dump_backtrace(example)
           format_backtrace(example.execution_result[:exception].backtrace, example).each do |backtrace_info|
-            output.puts detail_color("#{long_padding}# #{backtrace_info}")
+            output_puts detail_color("#{long_padding}# #{backtrace_info}")
           end
         end
 
         def dump_pending_fixed(example, index)
-          output.puts "#{short_padding}#{index.next}) #{example.full_description} FIXED"
-          output.puts fixed_color("#{long_padding}Expected pending '#{example.metadata[:execution_result][:pending_message]}' to fail. No Error was raised.")
+          output_puts "#{short_padding}#{index.next}) #{example.full_description} FIXED"
+          output_puts fixed_color("#{long_padding}Expected pending '#{example.metadata[:execution_result][:pending_message]}' to fail. No Error was raised.")
         end
 
         def pending_fixed?(example)
@@ -267,16 +267,16 @@ module RSpec
         end
 
         def dump_failure(example, index)
-          output.puts "#{short_padding}#{index.next}) #{example.full_description}"
+          output_puts "#{short_padding}#{index.next}) #{example.full_description}"
           dump_failure_info(example)
         end
 
         def dump_failure_info(example)
           exception = example.execution_result[:exception]
           exception_class_name = exception_class_name_for(exception)
-          output.puts "#{long_padding}#{failure_color("Failure/Error:")} #{failure_color(read_failed_line(exception, example).strip)}"
-          output.puts "#{long_padding}#{failure_color(exception_class_name)}:" unless exception_class_name =~ /RSpec/
-          exception.message.to_s.split("\n").each { |line| output.puts "#{long_padding}  #{failure_color(line)}" } if exception.message
+          output_puts "#{long_padding}#{failure_color("Failure/Error:")} #{failure_color(read_failed_line(exception, example).strip)}"
+          output_puts "#{long_padding}#{failure_color(exception_class_name)}:" unless exception_class_name =~ /RSpec/
+          exception.message.to_s.split("\n").each { |line| output_puts "#{long_padding}  #{failure_color(line)}" } if exception.message
 
           if shared_group = find_shared_group(example)
             dump_shared_failure_info(shared_group)
@@ -290,7 +290,7 @@ module RSpec
         end
 
         def dump_shared_failure_info(group)
-          output.puts "#{long_padding}Shared Example Group: \"#{group.metadata[:shared_group_name]}\" called from " +
+          output_puts "#{long_padding}Shared Example Group: \"#{group.metadata[:shared_group_name]}\" called from " +
             "#{backtrace_line(group.metadata[:example_group][:location])}"
         end
 

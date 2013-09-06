@@ -22,7 +22,7 @@ module RSpec
 
         def start_dump
           super()
-          output.puts
+          output_puts
         end
 
       end

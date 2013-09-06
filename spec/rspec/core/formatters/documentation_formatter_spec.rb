@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'spec_helper'
 require 'rspec/core/formatters/documentation_formatter'
 
@@ -84,5 +86,26 @@ root
     example 3 (FAILED - 1)
 ")
     end
+
+    it "forces conversion to ASCII" do
+      output = StringIO.new
+      RSpec.configuration.stub(:color_enabled?) { false }
+
+      formatter = RSpec::Core::Formatters::DocumentationFormatter.new(output)
+
+      group = RSpec::Core::ExampleGroup.describe(" root ")
+      context1 = group.describe(" nested ")
+      context1.example(" example 3 × 4") {}
+
+      group.run(RSpec::Core::Reporter.new(formatter))
+
+      expect(output.string).to eql("
+root
+  nested
+    example 3 ? 4
+")
+    end
+
+
   end
 end

@@ -285,6 +285,11 @@ module RSpec
 
           example_groups.sort_by {|_, hash| -hash[:average]}.first(number_of_examples)
         end
+
+        protected
+        def output_puts(message = nil)
+          @output.puts message ? message.encode("ASCII", invalid: :replace, undef: :replace, replace: '?') : nil
+        end
       end
     end
   end
